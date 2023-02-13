@@ -1,31 +1,49 @@
-import { FaCloud } from "react-icons/fa";
+import { useSelector } from "react-redux";
+import setWeatherIcon from "../functions/setWeatherIcon";
 
-const HourlyWeatherLine = () => {
+const HourlyWeatherLine = ({ index, dayFormatter, hourFormatter }) => {
+  const { hourly } = useSelector((store) => store.forecast.forecast);
   return (
     <div className="hour-row flex justify-center gap-10 p-2 odd:bg-gray-300 even:bg-gray-100">
       <div className="info-group flex flex-col items-center">
-        <div className="label text-xs font-bold uppercase">Thursday</div>
-        <div className="hour">3 PM</div>
+        <div className="label text-xs font-bold uppercase">
+          {dayFormatter.format(hourly[index].timestamp)}
+        </div>
+        <div className="hour">
+          {hourFormatter.format(hourly[index].timestamp)}
+        </div>
       </div>
-      <FaCloud className="weather-icon animate-wiggle text-5xl" />
+      {setWeatherIcon(hourly[index].iconCode)}{" "}
       <div className="info-group flex flex-col items-center">
         <div className="label text-xs font-bold uppercase">temp </div>
-        <div className="hour">31&deg;</div>
-      </div>
-      <div className="info-group flex flex-col items-center">
-        <div className="label text-xs font-bold uppercase">Fl temp</div>
-        <div className="hour">25&deg;</div>
-      </div>
-      <div className="info-group flex flex-col items-center">
-        <div className="label text-xs font-bold uppercase">wind</div>
         <div className="hour">
-          6<span className="text-xs">mph</span>
+          {hourly[index].temp}
+          {hourly[index].hourly_units.apparent_temperature}
         </div>
       </div>
       <div className="info-group flex flex-col items-center">
-        <div className="label text-xs font-bold uppercase">precip</div>
+        <div className="label text-xs font-bold uppercase">Ress.</div>
         <div className="hour">
-          0<span className="text-xs">in</span>
+          {hourly[index].feelsLike}
+          {hourly[index].hourly_units.temperature_2m}
+        </div>
+      </div>
+      <div className="info-group flex flex-col items-center">
+        <div className="label text-xs font-bold uppercase">vent</div>
+        <div className="hour">
+          {hourly[index].windSpeed}{" "}
+          <span className="text-xs">
+            {hourly[index].hourly_units.windspeed_10m}
+          </span>
+        </div>
+      </div>
+      <div className="info-group flex flex-col items-center">
+        <div className="label text-xs font-bold uppercase">précip</div>
+        <div className="hour">
+          {hourly[index].precip}{" "}
+          <span className="text-xs">
+            {hourly[index].hourly_units.precipitation}
+          </span>
         </div>
       </div>
     </div>

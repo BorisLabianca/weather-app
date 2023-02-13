@@ -1,8 +1,16 @@
 import "./App.css";
-import { FaSun } from "react-icons/fa";
-import { RiSnowyFill } from "react-icons/ri";
-import { useEffect, useState } from "react";
+import { RiSunFill } from "react-icons/ri";
+import { useEffect } from "react";
 import axios from "axios";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  addCoords,
+  switchLocationLoading,
+} from "./features/coords/coordsSlice";
+import {
+  switchIsloading,
+  addForecastInfo,
+} from "./features/forecast/forecastSlice";
 
 // Import des composants
 import DayCard from "./components/DayCard";
@@ -11,10 +19,33 @@ import HourlyWeatherLine from "./components/HourlyWeatherLine";
 // https://api.open-meteo.com/v1/forecast?hourly=temperature_2m,apparent_temperature,precipitation,weathercode,windspeed_10m&daily=weathercode,temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,precipitation_sum&current_weather=true
 
 function App() {
-  const [current, setCurrent] = useState("");
-  const [daily, setDaily] = useState("");
-  const [hourly, setHourly] = useState("");
+  const dispatch = useDispatch();
+  const { coords, locationLoading } = useSelector((store) => store.coords);
+  const { isLoading, forecast } = useSelector((store) => store.forecast);
 
+  useEffect(() => {
+    const getLocation = async () => {
+      try {
+        await navigator.geolocation.getCurrentPosition((position) => {
+          dispatch(
+            addCoords({
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+            })
+          );
+          localStorage.setItem("latitude", Number(position.coords.latitude));
+          localStorage.setItem("longitude", Number(position.coords.longitude));
+        });
+        dispatch(switchLocationLoading(false));
+      } catch (error) {
+        console.log(error.data);
+        alert(
+          "There was an error getting your location. Please allow us to use your location and refresh the page."
+        );
+      }
+    };
+    getLocation();
+  }, []);
   useEffect(() => {
     const getWeather = async (lat, lng, timezone) => {
       try {
@@ -24,7 +55,7 @@ function App() {
             params: { latitude: lat, longitude: lng, timezone: timezone },
           }
         );
-        console.log("1st log : ", data);
+        // console.log("1st log : ", data);
         const parseCurrentWeather = ({
           current_weather,
           daily,
@@ -87,30 +118,57 @@ function App() {
               ({ timestamp }) => timestamp >= current_weather.time * 1000
             );
         };
-        console.log("2nd log : ", parseCurrentWeather(data));
-        setCurrent(parseCurrentWeather(data));
-        setDaily(parseDailyWeather(data));
-        console.log("3rd log : ", parseDailyWeather(data));
-        setHourly(parseHourlyWeather(data));
-        console.log("4th log : ", parseHourlyWeather(data));
+        // console.log("2nd log : ", parseCurrentWeather(data));
+        dispatch(
+          addForecastInfo({
+            current: parseCurrentWeather(data),
+            daily: parseDailyWeather(data),
+            hourly: parseHourlyWeather(data),
+          })
+        );
+        dispatch(switchIsloading(false));
+        dispatch(switchLocationLoading(true));
+        // setCurrent(parseCurrentWeather(data));
+        // setDaily(parseDailyWeather(data));
+        // console.log("3rd log : ", parseDailyWeather(data));
+        // setHourly(parseHourlyWeather(data));
+        // console.log("4th log : ", parseHourlyWeather(data));
       } catch (error) {
-        console.log(error);
+        console.log(error.data);
       }
     };
-    getWeather(10, 10, Intl.DateTimeFormat().resolvedOptions().timeZone);
-  }, []);
+    if (!locationLoading && coords.latitude && coords.longitude) {
+      getWeather(
+        localStorage.getItem("latitude")
+          ? localStorage.getItem("latitude")
+          : coords.latitude,
+        localStorage.getItem("longitude")
+          ? localStorage.getItem("longitude")
+          : coords.longitude,
+        Intl.DateTimeFormat().resolvedOptions().timeZone
+      );
+    }
+  }, [coords, locationLoading]);
+  const DAY_FORMATTER = new Intl.DateTimeFormat(undefined, { weekday: "long" });
+  const HOUR_FORMATTER = new Intl.DateTimeFormat(undefined, {
+    hour: "numeric",
+  });
 
-  return (
+  return isLoading || !forecast ? (
+    <div className="flex h-screen items-center justify-center">
+      <RiSunFill className="weather-icon animate-loader text-8xl text-amber-300" />
+    </div>
+  ) : (
     <div className="App ">
       <header className="header mx-auto mt-8 flex w-[1220px] justify-center gap-8">
         <div className="header-left flex h-48 items-center gap-4 border-r-2 border-solid border-black pr-8">
-          <FaSun
-            className="weather-icon animate-wiggle text-8xl"
+          <RiSunFill
+            className="weather-icon animate-wiggle text-8xl text-amber-300"
             data-current-icon
           />
-          <RiSnowyFill className="weather-icon ani animate-wiggle text-8xl" />
           <div className="header-current-temp text-4xl ">
-            <span data-current-temp>31</span>&deg;
+            <span data-current-temp>{forecast.current.currentTemp}</span>
+            {forecast.current.dailyUnits.temperature_2m_max}
           </div>
         </div>
         <div className="header-right flex w-52 flex-wrap items-center gap-2">
@@ -158,27 +216,31 @@ function App() {
         className="day-section flex flex-wrap  items-center justify-center gap-2 p-4  "
         data-day-section
       >
-        <DayCard />
-        <DayCard />
-        <DayCard />
-        <DayCard />
-        <DayCard />
-        <DayCard />
-        <DayCard />
+        {forecast.daily &&
+          forecast.daily.map((day, index) => {
+            return (
+              <DayCard key={index} index={index} dayFormatter={DAY_FORMATTER} />
+            );
+          })}
       </section>
       <section className="hourly-weather justify-center">
-        <HourlyWeatherLine />
-        <HourlyWeatherLine />
-        <HourlyWeatherLine />
-        <HourlyWeatherLine />
-        <HourlyWeatherLine />
-        <HourlyWeatherLine />
-        <HourlyWeatherLine />
-        <HourlyWeatherLine />
-        <HourlyWeatherLine />
-        <HourlyWeatherLine />
-        <HourlyWeatherLine />
-        <HourlyWeatherLine />
+        {forecast.hourly &&
+          forecast.hourly.map((_, index) => {
+            return (
+              index < 24 && (
+                <HourlyWeatherLine
+                  key={index}
+                  index={index}
+                  hourFormatter={HOUR_FORMATTER}
+                  dayFormatter={DAY_FORMATTER}
+                />
+              )
+            );
+          })}
+        {/* {console.log(
+          "after isLoading passed to false : ",
+          forecast.hourly.length
+        )} */}
       </section>
     </div>
   );
