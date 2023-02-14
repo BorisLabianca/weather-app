@@ -11,18 +11,29 @@ import {
   switchIsloading,
   addForecastInfo,
 } from "./features/forecast/forecastSlice";
+import {
+  switchLanguage,
+  switchUnits,
+} from "./features/localization/localizationSlice";
 
 // Import des composants
+import MainCard from "./components/MainCard";
 import DayCard from "./components/DayCard";
 import HourlyWeatherLine from "./components/HourlyWeatherLine";
 
 // https://api.open-meteo.com/v1/forecast?hourly=temperature_2m,apparent_temperature,precipitation,weathercode,windspeed_10m&daily=weathercode,temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,precipitation_sum&current_weather=true
 
+// https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=51.5072&longitude=0.1276&localityLanguage=fr
+
 function App() {
   const dispatch = useDispatch();
   const { coords, locationLoading } = useSelector((store) => store.coords);
   const { isLoading, forecast } = useSelector((store) => store.forecast);
-
+  const { language, fahrenheit } = useSelector((store) => store.localization);
+  // const temperatureUnit = "celsius";
+  // const precipitationUnit = "mm";
+  // const windspeedUnit = "kmh";
+  // const language = "fr";
   useEffect(() => {
     const getLocation = async () => {
       try {
@@ -38,7 +49,7 @@ function App() {
         });
         dispatch(switchLocationLoading(false));
       } catch (error) {
-        console.log(error.data);
+        console.log(error);
         alert(
           "There was an error getting your location. Please allow us to use your location and refresh the page."
         );
@@ -47,20 +58,37 @@ function App() {
     getLocation();
   }, []);
   useEffect(() => {
-    const getWeather = async (lat, lng, timezone) => {
+    const getWeather = async (lat, lng, timezone, fahrenheit) => {
       try {
         const { data } = await axios.get(
-          "https://api.open-meteo.com/v1/forecast?hourly=temperature_2m,apparent_temperature,precipitation,weathercode,windspeed_10m&daily=weathercode,temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,precipitation_sum&current_weather=true&timeformat=unixtime",
+          `https://api.open-meteo.com/v1/forecast?hourly=temperature_2m,apparent_temperature,precipitation,weathercode,windspeed_10m&daily=weathercode,temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,precipitation_sum&current_weather=true&timeformat=unixtime&${
+            fahrenheit &&
+            "temperature_unit=fahrenheit&windspeed_unit=mph&precipitation_unit=inch"
+          }`,
           {
-            params: { latitude: lat, longitude: lng, timezone: timezone },
+            params: {
+              latitude: lat,
+              longitude: lng,
+              timezone: timezone,
+            },
           }
         );
+        const city = await axios.get(
+          "https://api.bigdatacloud.net/data/reverse-geocode-client",
+          {
+            params: {
+              latitude: lat,
+              longitude: lng,
+              localityLanguage: language,
+            },
+          }
+        );
+        // console.log("city : ", city.data);
         // console.log("1st log : ", data);
-        const parseCurrentWeather = ({
-          current_weather,
-          daily,
-          daily_units,
-        }) => {
+        const parseCurrentWeather = (
+          { current_weather, daily, hourly_units },
+          { city, principalSubdivision }
+        ) => {
           const {
             temperature: currentTemp,
             windspeed: windSpeed,
@@ -80,9 +108,11 @@ function App() {
             highFeelsLike: Math.round(maxFeelsLike),
             lowFeelsLike: Math.round(minFeelsLike),
             windSpeed: Math.round(windSpeed),
-            precip,
+            precip: Math.round(precip * 100) / 100,
             iconCode,
-            dailyUnits: daily_units,
+            dailyUnits: hourly_units,
+            city,
+            principalSubdivision,
           };
         };
         const parseDailyWeather = ({ daily, daily_units }) => {
@@ -92,7 +122,7 @@ function App() {
               iconCode: daily.weathercode[index],
               maxTemp: Math.round(daily.temperature_2m_max[index]),
               minTemp: Math.round(daily.temperature_2m_min[index]),
-              precip: daily.precipitation_sum[index],
+              precip: Math.round(daily.precipitation_sum[index] * 100) / 100,
               daily_units,
             };
           });
@@ -110,7 +140,7 @@ function App() {
                 temp: Math.round(hourly.temperature_2m[index]),
                 feelsLike: Math.round(hourly.apparent_temperature[index]),
                 windSpeed: Math.round(hourly.windspeed_10m[index]),
-                precip: hourly.precipitation[index],
+                precip: Math.round(hourly.precipitation[index] * 100) / 100,
                 hourly_units,
               };
             })
@@ -121,7 +151,7 @@ function App() {
         // console.log("2nd log : ", parseCurrentWeather(data));
         dispatch(
           addForecastInfo({
-            current: parseCurrentWeather(data),
+            current: parseCurrentWeather(data, city.data),
             daily: parseDailyWeather(data),
             hourly: parseHourlyWeather(data),
           })
@@ -134,7 +164,7 @@ function App() {
         // setHourly(parseHourlyWeather(data));
         // console.log("4th log : ", parseHourlyWeather(data));
       } catch (error) {
-        console.log(error.data);
+        console.log(error);
       }
     };
     if (!locationLoading && coords.latitude && coords.longitude) {
@@ -145,10 +175,11 @@ function App() {
         localStorage.getItem("longitude")
           ? localStorage.getItem("longitude")
           : coords.longitude,
-        Intl.DateTimeFormat().resolvedOptions().timeZone
+        Intl.DateTimeFormat().resolvedOptions().timeZone,
+        fahrenheit
       );
     }
-  }, [coords, locationLoading]);
+  }, [coords, locationLoading, fahrenheit, language]);
   const DAY_FORMATTER = new Intl.DateTimeFormat(undefined, { weekday: "long" });
   const HOUR_FORMATTER = new Intl.DateTimeFormat(undefined, {
     hour: "numeric",
@@ -160,58 +191,86 @@ function App() {
     </div>
   ) : (
     <div className="App ">
-      <header className="header mx-auto mt-8 flex w-[1220px] justify-center gap-8">
-        <div className="header-left flex h-48 items-center gap-4 border-r-2 border-solid border-black pr-8">
-          <RiSunFill
-            className="weather-icon animate-wiggle text-8xl text-amber-300"
-            data-current-icon
-          />
-          <div className="header-current-temp text-4xl ">
-            <span data-current-temp>{forecast.current.currentTemp}</span>
-            {forecast.current.dailyUnits.temperature_2m_max}
-          </div>
+      <header></header>
+      <MainCard />
+      <label className="fixed top-2 left-4 flex">
+        <input
+          type={"checkbox"}
+          className="peer appearance-none"
+          onClick={() => {
+            dispatch(switchLanguage());
+            dispatch(switchLocationLoading(false));
+          }}
+        />
+        <span className="flex h-7 w-12 flex-shrink-0 items-center rounded-full bg-violet-300 p-1 duration-300 ease-in-out after:h-5 after:w-5 after:rounded-full after:bg-white after:duration-300 peer-checked:bg-blue-500 peer-checked:after:translate-x-5 "></span>
+      </label>
+      <label className="fixed top-11 left-4 flex">
+        <input
+          type={"checkbox"}
+          className="peer appearance-none"
+          onClick={() => {
+            dispatch(switchUnits());
+            dispatch(switchLocationLoading(false));
+          }}
+        />
+        <span className="flex h-7 w-12 flex-shrink-0 items-center rounded-full bg-violet-300 p-1 duration-300 ease-in-out after:h-5 after:w-5 after:rounded-full after:bg-white after:duration-300 peer-checked:bg-blue-500 peer-checked:after:translate-x-5 "></span>
+      </label>
+      {/* <div className="fixed top-2 left-4 flex w-20 rounded-3xl">
+        <div
+          onClick={() => {
+            dispatch(switchLanguage());
+            dispatch(switchLocationLoading(false));
+          }}
+          className={`w-8 cursor-pointer rounded-l-3xl font-bold ${
+            language === "en"
+              ? "bg-blue-500 shadow-switchinl"
+              : "bg-slate-400 shadow-switchl"
+          }`}
+        >
+          en
         </div>
-        <div className="header-right flex w-52 flex-wrap items-center gap-2">
-          <div className="info-group flex flex-col items-center">
-            <div className="label text-xs font-bold uppercase">High</div>
-            <div>
-              <span data-current-high>32</span>&deg;
-            </div>
-          </div>
-          <div className="info-group flex flex-col items-center">
-            <div className="label text-xs font-bold uppercase">FL High</div>
-            <div>
-              <span data-current-fl-high>27</span>&deg;
-            </div>
-          </div>
-          <div className="info-group flex flex-col items-center">
-            <div className="label text-xs font-bold uppercase">Wind</div>
-            <div>
-              <span data-current-wind>9</span>
-              <span className="text-xs">mph</span>
-            </div>
-          </div>
-          <div className="info-group flex flex-col items-center">
-            <div className="label text-xs font-bold uppercase">Low</div>
-            <div>
-              <span data-current-low>19</span>&deg;
-            </div>
-          </div>
-          <div className="info-group flex flex-col items-center">
-            <div className="label text-xs font-bold uppercase">FL Low</div>
-            <div>
-              <span data-current-fl-low>12</span>&deg;
-            </div>
-          </div>
-          <div className="info-group flex flex-col items-center">
-            <div className="label text-xs font-bold uppercase">Precip</div>
-            <div>
-              <span data-current-precip>0.1</span>
-              <span className="text-xs">in</span>
-            </div>
-          </div>
+        <div
+          onClick={() => {
+            dispatch(switchLanguage());
+            dispatch(switchLocationLoading(false));
+          }}
+          className={`w-8 cursor-pointer rounded-r-3xl font-bold ${
+            language === "fr"
+              ? "bg-blue-500 shadow-switchinr"
+              : "bg-slate-400 shadow-switchr"
+          }`}
+        >
+          fr
         </div>
-      </header>
+      </div>
+      <div className="fixed top-9 left-4 flex">
+        <div
+          onClick={() => {
+            dispatch(switchUnits());
+            dispatch(switchLocationLoading(false));
+          }}
+          className={`w-8 cursor-pointer rounded-l-3xl font-bold ${
+            !fahrenheit
+              ? "bg-blue-500 shadow-switchinl"
+              : "bg-slate-400 shadow-switchl"
+          }`}
+        >
+          &deg;C
+        </div>
+        <div
+          onClick={() => {
+            dispatch(switchUnits());
+            dispatch(switchLocationLoading(false));
+          }}
+          className={`w-8 cursor-pointer rounded-r-3xl font-bold ${
+            fahrenheit
+              ? "bg-blue-500 shadow-switchinr"
+              : "bg-slate-400 shadow-switchr"
+          }`}
+        >
+          &deg;F
+        </div>
+      </div> */}
       <section
         className="day-section flex flex-wrap  items-center justify-center gap-2 p-4  "
         data-day-section

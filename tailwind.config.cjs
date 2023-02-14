@@ -31,6 +31,12 @@ module.exports = {
         wiggle: "wiggle 2s ease-in-out infinite",
         loader: "loader 3s linear infinite",
       },
+      boxShadow: {
+        switchl: "-2px 2px 5px black",
+        switchr: "2px 2px 5px black",
+        switchinl: "inset 2px -2px 3px lightgray",
+        switchinr: "inset -2px -2px 3px lightgray",
+      },
     },
   },
   plugins: [],

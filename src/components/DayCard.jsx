@@ -1,14 +1,18 @@
 import { useSelector } from "react-redux";
 import setWeatherIcon from "../functions/setWeatherIcon";
+import switchDayLanguage from "../functions/switchDayLanguage";
 
 const DayCard = ({ index, dayFormatter }) => {
   const { daily } = useSelector((store) => store.forecast.forecast);
-  console.log(daily);
+  const { language } = useSelector((store) => store.localization);
   return (
     <div className="day-card flex flex-col items-center rounded-lg border-2 border-solid border-black p-3 ">
-      {setWeatherIcon(daily[index].iconCode)}
+      {setWeatherIcon(daily[index].iconCode, "text-7xl")}
       <div className="day-card-day mt-2 text-sm uppercase ">
-        {dayFormatter.format(daily[index].timestamp)}
+        {switchDayLanguage(
+          dayFormatter.format(daily[index].timestamp),
+          language
+        )}
       </div>
       <div className="day-card-temp text-3xl">
         {daily[index].maxTemp}

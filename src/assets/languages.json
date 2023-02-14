@@ -1,0 +1,20 @@
+{
+  "eng": {
+    "max": "High",
+    "min": "Low",
+    "wind": "wind",
+    "flHigh": "FL High",
+    "flLow": "FL Low",
+    "precip": "Precip",
+    "fl": "FL Temp"
+  },
+  "fr": {
+    "max": "Max",
+    "min": "Min",
+    "wind": "Vent",
+    "flHigh": "Ress. Max",
+    "flLow": "Ress. Min",
+    "precip": "Précip",
+    "fl": "Ress."
+  }
+}
