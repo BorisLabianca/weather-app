@@ -15,6 +15,7 @@ import {
   switchLanguage,
   switchUnits,
 } from "./features/localization/localizationSlice";
+import { switchTheme } from "./features/theme/themeSlice";
 
 // Import des composants
 import MainCard from "./components/MainCard";
@@ -30,6 +31,7 @@ function App() {
   const { coords, locationLoading } = useSelector((store) => store.coords);
   const { isLoading, forecast } = useSelector((store) => store.forecast);
   const { language, fahrenheit } = useSelector((store) => store.localization);
+  const { theme } = useSelector((store) => store.theme);
   // const temperatureUnit = "celsius";
   // const precipitationUnit = "mm";
   // const windspeedUnit = "kmh";
@@ -93,6 +95,7 @@ function App() {
             temperature: currentTemp,
             windspeed: windSpeed,
             weathercode: iconCode,
+            time,
           } = current_weather;
           const {
             temperature_2m_max: [maxTemp],
@@ -110,6 +113,7 @@ function App() {
             windSpeed: Math.round(windSpeed),
             precip: Math.round(precip * 100) / 100,
             iconCode,
+            time,
             dailyUnits: hourly_units,
             city,
             principalSubdivision,
@@ -190,32 +194,44 @@ function App() {
       <RiSunFill className="weather-icon animate-loader text-8xl text-amber-300" />
     </div>
   ) : (
-    <div className="App ">
-      <header></header>
-      <MainCard />
-      <label className="fixed top-2 left-4 flex">
-        <input
-          type={"checkbox"}
-          className="peer appearance-none"
-          onClick={() => {
-            dispatch(switchLanguage());
-            dispatch(switchLocationLoading(false));
-          }}
-        />
-        <span className="flex h-7 w-12 flex-shrink-0 items-center rounded-full bg-violet-300 p-1 duration-300 ease-in-out after:h-5 after:w-5 after:rounded-full after:bg-white after:duration-300 peer-checked:bg-blue-500 peer-checked:after:translate-x-5 "></span>
-      </label>
-      <label className="fixed top-11 left-4 flex">
-        <input
-          type={"checkbox"}
-          className="peer appearance-none"
-          onClick={() => {
-            dispatch(switchUnits());
-            dispatch(switchLocationLoading(false));
-          }}
-        />
-        <span className="flex h-7 w-12 flex-shrink-0 items-center rounded-full bg-violet-300 p-1 duration-300 ease-in-out after:h-5 after:w-5 after:rounded-full after:bg-white after:duration-300 peer-checked:bg-blue-500 peer-checked:after:translate-x-5 "></span>
-      </label>
-      {/* <div className="fixed top-2 left-4 flex w-20 rounded-3xl">
+    <div className={`App ${theme === "dark" && "dark"} h-full`}>
+      <div className="h-auto dark:bg-slate-800 dark:text-white ">
+        <div className="app-container my-0 mx-auto w-3/4 py-8   ">
+          <header></header>
+          <MainCard hourFormatter={HOUR_FORMATTER} />
+          <label className="fixed top-2 left-4 flex">
+            <input
+              type={"checkbox"}
+              className="peer appearance-none"
+              onClick={() => {
+                dispatch(switchLanguage());
+                dispatch(switchLocationLoading(false));
+              }}
+            />
+            <span className="flex h-7 w-12 flex-shrink-0 items-center rounded-full bg-violet-300 p-1 duration-300 ease-in-out after:h-5 after:w-5 after:rounded-full after:bg-white after:duration-300 peer-checked:bg-blue-500 peer-checked:after:translate-x-5 "></span>
+          </label>
+          <label className="fixed top-11 left-4 flex">
+            <input
+              type={"checkbox"}
+              className="peer appearance-none"
+              onClick={() => {
+                dispatch(switchUnits());
+                dispatch(switchLocationLoading(false));
+              }}
+            />
+            <span className="flex h-7 w-12 flex-shrink-0 items-center rounded-full bg-violet-300 p-1 duration-300 ease-in-out after:h-5 after:w-5 after:rounded-full after:bg-white after:duration-300 peer-checked:bg-blue-500 peer-checked:after:translate-x-5 "></span>
+          </label>
+          <label className="fixed top-[5rem] left-4 flex">
+            <input
+              type={"checkbox"}
+              className="peer appearance-none"
+              onClick={() => {
+                dispatch(switchTheme());
+              }}
+            />
+            <span className="flex h-7 w-12 flex-shrink-0 items-center rounded-full bg-violet-300 p-1 duration-300 ease-in-out after:h-5 after:w-5 after:rounded-full after:bg-white after:duration-300 peer-checked:bg-blue-500 peer-checked:after:translate-x-5 "></span>
+          </label>
+          {/* <div className="fixed top-2 left-4 flex w-20 rounded-3xl">
         <div
           onClick={() => {
             dispatch(switchLanguage());
@@ -271,36 +287,42 @@ function App() {
           &deg;F
         </div>
       </div> */}
-      <section
-        className="day-section flex flex-wrap  items-center justify-center gap-2 p-4  "
-        data-day-section
-      >
-        {forecast.daily &&
-          forecast.daily.map((day, index) => {
-            return (
-              <DayCard key={index} index={index} dayFormatter={DAY_FORMATTER} />
-            );
-          })}
-      </section>
-      <section className="hourly-weather justify-center">
-        {forecast.hourly &&
-          forecast.hourly.map((_, index) => {
-            return (
-              index < 24 && (
-                <HourlyWeatherLine
-                  key={index}
-                  index={index}
-                  hourFormatter={HOUR_FORMATTER}
-                  dayFormatter={DAY_FORMATTER}
-                />
-              )
-            );
-          })}
-        {/* {console.log(
+          <section
+            className="day-section flex flex-wrap  items-center justify-center gap-2 p-4  "
+            data-day-section
+          >
+            {forecast.daily &&
+              forecast.daily.map((day, index) => {
+                return (
+                  <DayCard
+                    key={index}
+                    index={index}
+                    dayFormatter={DAY_FORMATTER}
+                  />
+                );
+              })}
+          </section>
+          <section className="hourly-weather justify-center">
+            {forecast.hourly &&
+              forecast.hourly.map((_, index) => {
+                return (
+                  index < 24 && (
+                    <HourlyWeatherLine
+                      key={index}
+                      index={index}
+                      hourFormatter={HOUR_FORMATTER}
+                      dayFormatter={DAY_FORMATTER}
+                    />
+                  )
+                );
+              })}
+            {/* {console.log(
           "after isLoading passed to false : ",
           forecast.hourly.length
         )} */}
-      </section>
+          </section>
+        </div>
+      </div>
     </div>
   );
 }

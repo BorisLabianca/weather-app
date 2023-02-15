@@ -1,5 +1,4 @@
 import {
-  RiSnowyFill,
   RiSunFill,
   RiCloudyFill,
   RiFoggyFill,
@@ -9,22 +8,39 @@ import {
   RiHeavyShowersFill,
   RiThunderstormsFill,
   RiHailFill,
-  RiSunCloudyFill,
+  RiMoonFill,
 } from "react-icons/ri";
+import { FaCloudMoon, FaCloudSun, FaSnowflake } from "react-icons/fa";
 
-const setWeatherIcon = (iconCode, size) => {
+const setWeatherIcon = (iconCode, size, time) => {
   if (iconCode === 0) {
-    return (
-      <RiSunFill
-        className={`weather-icon animate-wiggle ${size} text-amber-300`}
-      />
-    );
+    if (time >= "18 h" || time < "06 h") {
+      return (
+        <RiMoonFill
+          className={`weather-icon animate-wiggle ${size} text-amber-300`}
+        />
+      );
+    } else {
+      return (
+        <RiSunFill
+          className={`weather-icon animate-wiggle ${size} text-amber-300`}
+        />
+      );
+    }
   } else if (iconCode === 1 || iconCode === 2) {
-    return (
-      <RiSunCloudyFill
-        className={`weather-icon animate-wiggle ${size} text-yellow-100`}
-      />
-    );
+    if (time >= "18 h" || time < "06 h") {
+      return (
+        <FaCloudMoon
+          className={`weather-icon animate-wiggle ${size} text-amber-300`}
+        />
+      );
+    } else {
+      return (
+        <FaCloudSun
+          className={`weather-icon animate-wiggle ${size} text-yellow-100`}
+        />
+      );
+    }
   } else if (iconCode === 3) {
     return (
       <RiCloudyFill
@@ -76,7 +92,7 @@ const setWeatherIcon = (iconCode, size) => {
     iconCode === 86
   ) {
     return (
-      <RiSnowyFill
+      <FaSnowflake
         className={`weather-icon animate-wiggle ${size} text-slate-300`}
       />
     );

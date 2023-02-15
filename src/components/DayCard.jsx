@@ -6,7 +6,7 @@ const DayCard = ({ index, dayFormatter }) => {
   const { daily } = useSelector((store) => store.forecast.forecast);
   const { language } = useSelector((store) => store.localization);
   return (
-    <div className="day-card flex flex-col items-center rounded-lg border-2 border-solid border-black p-3 ">
+    <div className="day-card flex flex-col items-center rounded-lg border-2 border-solid border-black p-3 dark:border-gray-400   ">
       {setWeatherIcon(daily[index].iconCode, "text-7xl")}
       <div className="day-card-day mt-2 text-sm uppercase ">
         {switchDayLanguage(

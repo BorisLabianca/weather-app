@@ -2,18 +2,22 @@ import { useSelector } from "react-redux";
 import setWeatherIcon from "../functions/setWeatherIcon";
 import languages from "../assets/languages.json";
 
-const MainCard = () => {
+const MainCard = ({ hourFormatter }) => {
   const { language } = useSelector((store) => store.localization);
   const { current } = useSelector((store) => store.forecast.forecast);
-  //   console.log(current);
+  // console.log(current);
   return (
-    <div className="header mx-auto mt-8 flex w-[1220px] justify-center gap-8">
-      <div className="header-left flex h-60 flex-col items-center gap-4 border-r-2 border-solid border-black pr-8">
+    <div className="header mx-auto flex w-[1220px] justify-center gap-8">
+      <div className="header-left flex h-60 flex-col items-center gap-4 border-r-2 border-solid border-black pr-8 dark:border-gray-400">
         {new Intl.DateTimeFormat(`${language}`, { dateStyle: "full" })
           .format(new Date())
           .toUpperCase()}
         <div className="flex items-center gap-8 ">
-          {setWeatherIcon(current.iconCode, "text-[9rem]")}
+          {setWeatherIcon(
+            current.iconCode,
+            "text-[9rem]",
+            hourFormatter.format(current.time)
+          )}
           <div className="header-current-temp text-8xl">
             <span data-current-temp>{current.currentTemp}</span>
             {current.dailyUnits.temperature_2m}
