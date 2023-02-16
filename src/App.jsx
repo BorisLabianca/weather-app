@@ -195,7 +195,7 @@ function App() {
     </div>
   ) : (
     <div className={`App ${theme === "dark" && "dark"} h-full`}>
-      <div className="h-auto dark:bg-slate-800 dark:text-white ">
+      <div className="h-auto dark:bg-slate-800 dark:text-white">
         <div className="app-container my-0 mx-auto w-3/4 py-8   ">
           <header></header>
           <MainCard hourFormatter={HOUR_FORMATTER} />
