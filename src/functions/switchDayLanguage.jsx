@@ -31,6 +31,22 @@ const switchDayLanguage = (formattedDay, language) => {
     } else if (formattedDay.toLowerCase() === "sunday") {
       return "Dimanche";
     }
+  } else if (language === "en") {
+    if (formattedDay.toLowerCase() === "monday") {
+      return "Monday";
+    } else if (formattedDay.toLowerCase() === "tuesday") {
+      return "Tuesday";
+    } else if (formattedDay.toLowerCase() === "wednesday") {
+      return "Wednesday";
+    } else if (formattedDay.toLowerCase() === "thursday") {
+      return "Thursday";
+    } else if (formattedDay.toLowerCase() === "friday") {
+      return "Friday";
+    } else if (formattedDay.toLowerCase() === "saturday") {
+      return "Saturday";
+    } else if (formattedDay.toLowerCase() === "sunday") {
+      return "Sunday";
+    }
   } else {
     return formattedDay;
   }
