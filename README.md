@@ -21,3 +21,4 @@
 - Call to Open-Meteo API
 - Language toggle: English, French
 - Unit toggle: Celsius, km/h, mm to Fahrenheit, m/h, inch
+- Dark mode
