@@ -14,7 +14,34 @@ import { FaCloudMoon, FaCloudSun, FaSnowflake } from "react-icons/fa";
 
 const setWeatherIcon = (iconCode, size, time) => {
   if (iconCode === 0) {
-    if (time >= "18 h" || time < "06 h") {
+    if (
+      time === "18 h" ||
+      time === "6 PM" ||
+      time === "06 h" ||
+      time === "6 AM" ||
+      time === "19 h" ||
+      time === "7 PM" ||
+      time === "20 h" ||
+      time === "8 PM" ||
+      time === "21 h" ||
+      time === "9 PM" ||
+      time === "22 h" ||
+      time === "10 PM" ||
+      time === "23 h" ||
+      time === "11 PM" ||
+      time === "00 h" ||
+      time === "24 PM" ||
+      time === "01 h" ||
+      time === "1 AM" ||
+      time === "02 h" ||
+      time === "2 AM" ||
+      time === "03 h" ||
+      time === "3 AM" ||
+      time === "04 h" ||
+      time === "4 AM" ||
+      time === "05 h" ||
+      time === "5 AM"
+    ) {
       return (
         <RiMoonFill
           className={`weather-icon animate-wiggle ${size} text-amber-300`}
@@ -28,7 +55,34 @@ const setWeatherIcon = (iconCode, size, time) => {
       );
     }
   } else if (iconCode === 1 || iconCode === 2) {
-    if (time >= "18 h" || time < "06 h") {
+    if (
+      time === "18 h" ||
+      time === "6 PM" ||
+      time === "06 h" ||
+      time === "6 AM" ||
+      time === "19 h" ||
+      time === "7 PM" ||
+      time === "20 h" ||
+      time === "8 PM" ||
+      time === "21 h" ||
+      time === "9 PM" ||
+      time === "22 h" ||
+      time === "10 PM" ||
+      time === "23 h" ||
+      time === "11 PM" ||
+      time === "00 h" ||
+      time === "24 PM" ||
+      time === "01 h" ||
+      time === "1 AM" ||
+      time === "02 h" ||
+      time === "2 AM" ||
+      time === "03 h" ||
+      time === "3 AM" ||
+      time === "04 h" ||
+      time === "4 AM" ||
+      time === "05 h" ||
+      time === "5 AM"
+    ) {
       return (
         <FaCloudMoon
           className={`weather-icon animate-wiggle ${size} text-amber-300`}

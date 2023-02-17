@@ -10,10 +10,7 @@ const HourlyWeatherLine = ({ index, dayFormatter, hourFormatter }) => {
     <div className="hour-row flex items-center justify-center odd:bg-blue-300 even:bg-blue-200 dark:odd:bg-slate-700 dark:even:bg-slate-500 lg:gap-10 lg:p-2 ">
       <div className="info-group flex flex-col items-center">
         <div className="label flex w-16 justify-center text-xs font-bold uppercase">
-          {switchDayLanguage(
-            dayFormatter.format(hourly[index].timestamp),
-            language
-          )}
+          {dayFormatter.format(hourly[index].timestamp)}
         </div>
         <div className="hour">
           {hourFormatter.format(hourly[index].timestamp)}

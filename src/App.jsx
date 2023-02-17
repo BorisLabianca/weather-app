@@ -185,10 +185,16 @@ function App() {
       );
     }
   }, [coords, locationLoading, fahrenheit, language]);
-  const DAY_FORMATTER = new Intl.DateTimeFormat(undefined, { weekday: "long" });
-  const HOUR_FORMATTER = new Intl.DateTimeFormat(undefined, {
-    hour: "numeric",
-  });
+  const DAY_FORMATTER = new Intl.DateTimeFormat(
+    language === "fr" ? "fr" : language === "en" && "en-US",
+    { weekday: "long" }
+  );
+  const HOUR_FORMATTER = new Intl.DateTimeFormat(
+    language === "fr" ? "fr" : language === "en" && "en-US",
+    {
+      hour: "numeric",
+    }
+  );
 
   return isLoading || !forecast ? (
     <div className="flex h-screen items-center justify-center">

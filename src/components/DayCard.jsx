@@ -5,14 +5,12 @@ import switchDayLanguage from "../functions/switchDayLanguage";
 const DayCard = ({ index, dayFormatter }) => {
   const { daily } = useSelector((store) => store.forecast.forecast);
   const { language } = useSelector((store) => store.localization);
+  console.log(dayFormatter.format(daily[index].timestamp));
   return (
     <div className="day-card flex w-[109px] flex-col items-center rounded-lg border-2 border-solid border-black p-1 dark:border-gray-400 md:p-3">
       {setWeatherIcon(daily[index].iconCode, "md:text-7xl text-3xl")}
       <div className="day-card-day md:text-m text-m mt-2 uppercase ">
-        {switchDayLanguage(
-          dayFormatter.format(daily[index].timestamp),
-          language
-        )}
+        {dayFormatter.format(daily[index].timestamp)}
       </div>
       <div className="day-card-temp text-2xl md:text-3xl">
         {daily[index].maxTemp}
