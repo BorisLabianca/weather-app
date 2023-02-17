@@ -7,7 +7,7 @@ const HourlyWeatherLine = ({ index, dayFormatter, hourFormatter }) => {
   const { hourly } = useSelector((store) => store.forecast.forecast);
   const { language } = useSelector((store) => store.localization);
   return (
-    <div className="hour-row flex items-center justify-center gap-10 p-2 odd:bg-gray-300 even:bg-gray-100 dark:odd:bg-slate-700 dark:even:bg-slate-500 ">
+    <div className="hour-row flex items-center justify-center odd:bg-blue-300 even:bg-blue-200 dark:odd:bg-slate-700 dark:even:bg-slate-500 lg:gap-10 lg:p-2 ">
       <div className="info-group flex flex-col items-center">
         <div className="label flex w-16 justify-center text-xs font-bold uppercase">
           {switchDayLanguage(
@@ -19,11 +19,14 @@ const HourlyWeatherLine = ({ index, dayFormatter, hourFormatter }) => {
           {hourFormatter.format(hourly[index].timestamp)}
         </div>
       </div>
-      {setWeatherIcon(
-        hourly[index].iconCode,
-        "text-5xl",
-        hourFormatter.format(hourly[index].timestamp)
-      )}
+      <div>
+        {setWeatherIcon(
+          hourly[index].iconCode,
+          "xl:text-5xl text-2xl",
+          hourFormatter.format(hourly[index].timestamp)
+        )}
+      </div>
+
       <div className="info-group flex flex-col items-center">
         <div className="label flex w-16 justify-center text-xs font-bold uppercase">
           temp.

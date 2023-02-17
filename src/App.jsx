@@ -1,5 +1,6 @@
 import "./App.css";
-import { RiSunFill } from "react-icons/ri";
+import { RiSunFill, RiMoonFill } from "react-icons/ri";
+import { FaThermometerHalf } from "react-icons/fa";
 import { useEffect } from "react";
 import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
@@ -196,10 +197,8 @@ function App() {
   ) : (
     <div className={`App ${theme === "dark" && "dark"} h-full`}>
       <div className="h-auto dark:bg-slate-800 dark:text-white">
-        <div className="app-container my-0 mx-auto w-3/4 py-8   ">
-          <header></header>
-          <MainCard hourFormatter={HOUR_FORMATTER} />
-          <label className="fixed top-2 left-4 flex">
+        <header className="fixed z-10 flex h-fit w-screen items-center justify-center gap-6 bg-white p-2 dark:bg-slate-800">
+          <label className="flex">
             <input
               type={"checkbox"}
               className="peer appearance-none"
@@ -208,9 +207,16 @@ function App() {
                 dispatch(switchLocationLoading(false));
               }}
             />
-            <span className="flex h-7 w-12 flex-shrink-0 items-center rounded-full bg-violet-300 p-1 duration-300 ease-in-out after:h-5 after:w-5 after:rounded-full after:bg-white after:duration-300 peer-checked:bg-blue-500 peer-checked:after:translate-x-5 "></span>
+            <span className="relative flex h-7 w-14 flex-shrink-0 items-center rounded-full bg-blue-500 p-1 duration-300 ease-in-out after:z-[1] after:h-5 after:w-5 after:rounded-full after:bg-[url('./assets/Flag_of_France.svg')] after:bg-cover after:bg-center after:duration-300 peer-checked:bg-blue-500 peer-checked:after:translate-x-7 peer-checked:after:bg-[url('./assets/Flag_of_the_United_Kingdom_(3-5).svg')] peer-checked:after:bg-cover peer-checked:after:bg-center">
+              <span className="absolute left-[5px] z-[0] justify-end text-sm text-white">
+                EN
+              </span>
+              <span className="absolute right-[5px] z-[0] justify-end text-sm text-white">
+                FR
+              </span>
+            </span>
           </label>
-          <label className="fixed top-11 left-4 flex">
+          <label className="flex">
             <input
               type={"checkbox"}
               className="peer appearance-none"
@@ -219,9 +225,16 @@ function App() {
                 dispatch(switchLocationLoading(false));
               }}
             />
-            <span className="flex h-7 w-12 flex-shrink-0 items-center rounded-full bg-violet-300 p-1 duration-300 ease-in-out after:h-5 after:w-5 after:rounded-full after:bg-white after:duration-300 peer-checked:bg-blue-500 peer-checked:after:translate-x-5 "></span>
+            <span className="relative flex h-7 w-14 flex-shrink-0 items-center rounded-full bg-blue-500 p-1 duration-300 ease-in-out after:z-[1] after:h-5 after:w-5 after:rounded-full after:bg-white after:bg-[url('./assets/thermometer.svg')] after:bg-[length:8px] after:bg-center after:bg-no-repeat after:duration-300 after:ease-in-out peer-checked:after:translate-x-7">
+              <span className="text-md absolute left-[5px] z-[0] justify-end text-white">
+                °F
+              </span>
+              <span className="text-md absolute right-[5px] z-[0] justify-end text-white">
+                °C
+              </span>
+            </span>
           </label>
-          <label className="fixed top-[5rem] left-4 flex">
+          <label className="flex">
             <input
               type={"checkbox"}
               className="peer appearance-none"
@@ -229,8 +242,14 @@ function App() {
                 dispatch(switchTheme());
               }}
             />
-            <span className="flex h-7 w-12 flex-shrink-0 items-center rounded-full bg-violet-300 p-1 duration-300 ease-in-out after:h-5 after:w-5 after:rounded-full after:bg-white after:duration-300 peer-checked:bg-blue-500 peer-checked:after:translate-x-5 "></span>
+            <span className="relative flex h-7 w-14 flex-shrink-0 items-center rounded-full bg-blue-500 p-1 duration-300 ease-in-out after:z-[1] after:h-5 after:w-5 after:rounded-full after:bg-white after:duration-300 after:ease-in-out peer-checked:bg-slate-600 peer-checked:after:translate-x-7 peer-checked:after:bg-black peer-checked:after:duration-300 peer-checked:after:ease-in-out">
+              <RiSunFill className="absolute right-1 z-[0] text-xl text-yellow-200" />
+              <RiMoonFill className="fixed z-[0] justify-end text-xl text-yellow-200" />
+            </span>
           </label>
+        </header>
+        <div className="app-container my-0 mx-auto pb-8 pt-14 lg:w-3/4">
+          <MainCard hourFormatter={HOUR_FORMATTER} />
           {/* <div className="fixed top-2 left-4 flex w-20 rounded-3xl">
         <div
           onClick={() => {
@@ -287,10 +306,7 @@ function App() {
           &deg;F
         </div>
       </div> */}
-          <section
-            className="day-section flex flex-wrap  items-center justify-center gap-2 p-4  "
-            data-day-section
-          >
+          <section className="day-section flex flex-wrap items-center justify-center gap-2 p-4">
             {forecast.daily &&
               forecast.daily.map((day, index) => {
                 return (
@@ -302,7 +318,7 @@ function App() {
                 );
               })}
           </section>
-          <section className="hourly-weather justify-center">
+          <section className="hourly-weather justify-center overflow-hidden rounded-xl">
             {forecast.hourly &&
               forecast.hourly.map((_, index) => {
                 return (

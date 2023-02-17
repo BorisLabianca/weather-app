@@ -1,6 +1,6 @@
 # Weather Web App
 
-<img width="1840" alt="Capture d’écran 2023-02-01 à 18 35 54" src="https://user-images.githubusercontent.com/114598539/219419856-2bfc64be-b7ac-4eb5-bfed-079126dbe69a.png">
+<img width="1840" alt="Capture d’écran 2023-02-01 à 18 35 54" src="https://user-images.githubusercontent.com/114598539/219783327-48bb9d71-07ef-4df4-84fc-a03e8cf3bcd2.gif">
 
 ## Techs used
 
