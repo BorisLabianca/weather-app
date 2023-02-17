@@ -14,7 +14,7 @@ import { FaCloudMoon, FaCloudSun, FaSnowflake } from "react-icons/fa";
 
 const setWeatherIcon = (iconCode, size, time) => {
   if (iconCode === 0) {
-    if (time >= "18 h" || time < "06 h") {
+    if (time >= "18 h" || time < "06 h" || time >= "6 PM" || time < "6 AM") {
       return (
         <RiMoonFill
           className={`weather-icon animate-wiggle ${size} text-amber-300`}
@@ -28,7 +28,7 @@ const setWeatherIcon = (iconCode, size, time) => {
       );
     }
   } else if (iconCode === 1 || iconCode === 2) {
-    if (time >= "18 h" || time < "06 h") {
+    if (time >= "18 h" || time < "06 h" || time >= "6 PM" || time < "6 AM") {
       return (
         <FaCloudMoon
           className={`weather-icon animate-wiggle ${size} text-amber-300`}
