@@ -40,22 +40,29 @@ function App() {
   useEffect(() => {
     const getLocation = async () => {
       try {
-        await navigator.geolocation.getCurrentPosition((position) => {
-          dispatch(
-            addCoords({
-              latitude: position.coords.latitude,
-              longitude: position.coords.longitude,
-            })
-          );
-          localStorage.setItem("latitude", Number(position.coords.latitude));
-          localStorage.setItem("longitude", Number(position.coords.longitude));
-        });
+        await navigator.geolocation.getCurrentPosition(
+          (position) => {
+            dispatch(
+              addCoords({
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude,
+              })
+            );
+            localStorage.setItem("latitude", Number(position.coords.latitude));
+            localStorage.setItem(
+              "longitude",
+              Number(position.coords.longitude)
+            );
+          },
+          () => {
+            alert(
+              "There was an error getting your location. Please allow us to use your location and refresh the page."
+            );
+          }
+        );
         dispatch(switchLocationLoading(false));
       } catch (error) {
         console.log(error);
-        alert(
-          "There was an error getting your location. Please allow us to use your location and refresh the page."
-        );
       }
     };
     getLocation();
